@@ -1,0 +1,25 @@
+# Ignore node_modules and other unnecessary directories
+node_modules
+npm-debug.log
+yarn-error.log
+vendor
+
+# Ignore IDE or editor specific files
+.idea
+.vscode
+*.swp
+
+# Ignore local environment configuration files
+.env
+.env.local
+
+# Ignore tests and documentation
+tests
+docs
+
+# Ignore logs and temporary files
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+
