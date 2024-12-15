@@ -17,10 +17,14 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
-WORKDIR /var/www/app
+WORKDIR /var/www
 
 # Copy the application code to the container
 COPY . .
+
+# Set permissions for laravel storage and cache
+RUN chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache
+RUN chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
 
 # Expose port 9000
 EXPOSE 9000
