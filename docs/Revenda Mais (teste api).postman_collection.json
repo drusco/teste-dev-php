@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "cd56ffdf-4c52-44f8-b09e-542cb913d8d4",
+		"name": "Revenda Mais (teste api)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14519620"
+	},
+	"item": [
+		{
+			"name": "List suppliers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/api/suppliers?per_page=3&order_by=created_at&order_direction=desc&filters[name]=bush",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"suppliers"
+					],
+					"query": [
+						{
+							"key": "per_page",
+							"value": "3"
+						},
+						{
+							"key": "order_by",
+							"value": "created_at"
+						},
+						{
+							"key": "order_direction",
+							"value": "desc"
+						},
+						{
+							"key": "filters[name]",
+							"value": "bush"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new supplier",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"document\": \"33945800239\",\n    \"name\": \"test\",\n    \"email\": \"teste@oxi.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/api/suppliers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"suppliers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get supplier",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9000/api/suppliers/19131243000197",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"suppliers",
+						"19131243000197"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update supplier",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phone\": \"48424991\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/api/suppliers/909090",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"suppliers",
+						"909090"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete supplier",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9000/api/suppliers/12345678901",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"suppliers",
+						"12345678901"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
