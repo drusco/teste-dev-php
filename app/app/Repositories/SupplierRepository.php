@@ -63,9 +63,9 @@ class SupplierRepository implements SupplierRepositoryInterface
     }
     
 
-    public function delete($id)
+    public function delete($document)
     {
-        $supplier = $this->find($id);
+        $supplier = Supplier::where('document', $document)->first();
         return $supplier->delete();
     }
 }

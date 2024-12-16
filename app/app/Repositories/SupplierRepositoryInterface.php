@@ -9,5 +9,5 @@ interface SupplierRepositoryInterface
     public function findCnpjData(string $cnpj): ?array;
     public function create(array $data);
     public function update($document, array $data);
-    public function delete($id);
+    public function delete($document);
 }

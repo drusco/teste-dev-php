@@ -133,9 +133,24 @@ class SupplierController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy($document)
     {
-        $this->supplierRepository->delete($id);
-        return response()->json(null, 204);
+        try {
+
+            $this->supplierRepository->delete($document);
+            return response()->json(null, 204);
+        } catch (Exception $e) {
+            // Log the error message
+            \Log::error('An error occurred while deleting the supplier.', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Handle custom error response
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'errors' => ['supplier' => ['An error occurred while deleting the supplier.']],
+            ], 500);
+        }
     }
 }
