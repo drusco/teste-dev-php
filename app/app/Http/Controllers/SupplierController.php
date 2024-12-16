@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Repositories\SupplierRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
 {
@@ -27,20 +28,49 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required_if:document,11|string|max:14',
-            'address' => 'required_if:document,11|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'document' => [
-                'required', 
-                'string', 
-                'regex:/^\d{11}$|^\d{14}$/'
-            ],
-        ]);
+        try {
 
-        return response()->json($this->supplierRepository->create($data), 201);
+            // validate the incoming request
+            $data = $request->validate([
+                'name' => 'required_if:document,11|string|max:255',
+                'address' => 'required_if:document,11|string|max:255',
+                'email' => 'required|string|email|max:255',
+                'phone' => 'nullable|string|max:20',
+                'document' => [
+                    'required', 
+                    'string', 
+                    'regex:/^\d{11}$|^\d{14}$/',
+                    'unique:suppliers,document'
+                ],
+            ]);
+
+            $documentLength = strlen($data['document']);
+
+            // Validate CNPJ document using an external service
+            if ($documentLength == 14) {
+                return [];
+            }
+    
+            // Attempt to create the supplier
+            $supplier = $this->supplierRepository->create($data);
+    
+            // Return success response if supplier is created
+            return response()->json($supplier, 201);
+        } catch (Exception $e) {
+            // Log the error message
+            Log::error('An error occurred while creating the supplier.', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Handle custom error response
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'errors' => ['supplier' => ['An error occurred while creating the supplier.']],
+            ], 500);
+        }
     }
+    
 
     public function update(Request $request, $id)
     {
