@@ -66,6 +66,11 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function delete($document)
     {
         $supplier = Supplier::where('document', $document)->first();
+
+        if(!$supplier) {
+            return null;
+        }
+        
         return $supplier->delete();
     }
 }
