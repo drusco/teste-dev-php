@@ -46,12 +46,22 @@ class SupplierRepository implements SupplierRepositoryInterface
         return Supplier::create($data);
     }
 
-    public function update($id, array $data)
+    public function update($document, array $data)
     {
-        $supplier = $this->find($id);
+        // Find the supplier by document
+        $supplier = Supplier::where('document', $document)->first();
+    
+        // If no supplier is found, return an error or handle it
+        if (!$supplier) {
+            return null;
+        }
+
+        // Update the supplier and return its data
         $supplier->update($data);
+    
         return $supplier;
     }
+    
 
     public function delete($id)
     {

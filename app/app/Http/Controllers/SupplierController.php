@@ -53,7 +53,7 @@ class SupplierController extends Controller
                     return response()->json([
                         'message' => 'The document is not a valid CNPJ',
                         'errors' => ['supplier' => ['An error occurred while creating the supplier.']],
-                    ], 500);
+                    ], 400);
                 }
 
                 // Add name and address from the external api
@@ -88,16 +88,49 @@ class SupplierController extends Controller
     }
     
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $document)
     {
-        $data = $request->validate([
-            'name' => 'required_if:document,11|string|max:255',
-            'address' => 'required_if:document,11|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'phone' => 'nullable|string|max:20'
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'nullable|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'email' => 'nullable|string|email|max:255',
+                'phone' => 'nullable|string|max:20'
+            ]);
 
-        return response()->json($this->supplierRepository->update($id, $data));
+            // Prevent some updates for CNPJ suppliers
+            if(strlen($document) == 14) {
+                if (isset($data['name']) || isset($data['address'])) {
+                    return response()->json([
+                        'message' => 'Cannot update the supplier name or address',
+                        'errors' => ['supplier' => ['An error occurred while updating the supplier.']],
+                    ], 400);
+                }
+            }
+
+            $supplier = $this->supplierRepository->update($document, $data);
+
+            if(!$supplier) {
+                return response()->json([
+                    'message' => 'The supplier document is not valid',
+                    'errors' => ['supplier' => ['An error occurred while updating the supplier.']],
+                ], 400);
+            }
+
+            return response()->json($supplier);
+        } catch (Exception $e) {
+            // Log the error message
+            \Log::error('An error occurred while updating the supplier.', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Handle custom error response
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'errors' => ['supplier' => ['An error occurred while updating the supplier.']],
+            ], 500);
+        }
     }
 
     public function destroy($id)
