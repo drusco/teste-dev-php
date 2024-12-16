@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\SupplierRepository;
 use App\Repositories\SupplierRepositoryInterface;
+use App\Repositories\ExternalApiRepository;
+use App\Repositories\ExternalApiRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
+        $this->app->bind(ExternalApiRepositoryInterface::class, ExternalApiRepository::class);
     }
 
     /**

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Repositories\SupplierRepositoryInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
 {
@@ -44,11 +43,28 @@ class SupplierController extends Controller
                 ],
             ]);
 
-            $documentLength = strlen($data['document']);
+            $document = $data['document'];
 
-            // Validate CNPJ document using an external service
-            if ($documentLength == 14) {
-                return [];
+            // Find CNPJ data using an external service
+            if (strlen($document) == 14) {
+                $cnpj = $this->supplierRepository->findCnpjData($document);
+
+                if(!$cnpj) {
+                    return response()->json([
+                        'message' => 'The document is not a valid CNPJ',
+                        'errors' => ['supplier' => ['An error occurred while creating the supplier.']],
+                    ], 500);
+                }
+
+                // Add name and address from the external api
+                $data['name'] = $cnpj['name'];
+                $data['address'] = $cnpj['address'];
+                
+                // If no phone is provided use the one from the external api
+                if(!isset($data['phone'])) {
+                    $data['phone'] = $cnpj['phone'];
+                }
+
             }
     
             // Attempt to create the supplier
@@ -58,7 +74,7 @@ class SupplierController extends Controller
             return response()->json($supplier, 201);
         } catch (Exception $e) {
             // Log the error message
-            Log::error('An error occurred while creating the supplier.', [
+            \Log::error('An error occurred while creating the supplier.', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
