@@ -16,9 +16,20 @@ class SupplierRepository implements SupplierRepositoryInterface
         $this->externalApiRepository = $externalApiRepository;
     }
 
-    public function all()
+    public function all($filters = [], $orderBy = 'id', $orderDirection = 'asc', $perPage = 15)
     {
-        return Supplier::all();
+        $query = Supplier::query();
+
+        // Apply filters
+        foreach ($filters as $filter => $value) {
+            $query->where($filter, 'like', "%{$value}%");
+        }
+
+        // Apply ordering
+        $query->orderBy($orderBy, $orderDirection);
+
+        // Apply pagination
+        return $query->paginate($perPage);
     }
 
     public function find($document)

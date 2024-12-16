@@ -15,9 +15,18 @@ class SupplierController extends Controller
         $this->supplierRepository = $supplierRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->supplierRepository->all());
+        // Get query parameters from the request
+        $perPage = $request->query('per_page', 15); 
+        $filters = $request->query('filters', []); 
+        $orderBy = $request->query('order_by', 'created_at'); 
+        $orderDirection = $request->query('order_direction', 'desc');
+
+        // Get the suppliers with pagination, filters and ordering
+        $suppliers = $this->supplierRepository->all($filters, $orderBy, $orderDirection, $perPage);
+
+        return response()->json($suppliers);
     }
 
     public function show($document)
