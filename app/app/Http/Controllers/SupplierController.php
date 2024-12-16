@@ -52,10 +52,10 @@ class SupplierController extends Controller
     {
         try {
 
-            // validate the incoming request
-            $data = $request->validate([
-                'name' => 'required_if:document,11|string|max:255',
-                'address' => 'required_if:document,11|string|max:255',
+            // set validation rules
+            $rules = [
+                'name' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
                 'email' => 'required|string|email|max:255',
                 'phone' => 'nullable|string|max:20',
                 'document' => [
@@ -64,9 +64,17 @@ class SupplierController extends Controller
                     'regex:/^\d{11}$|^\d{14}$/',
                     'unique:suppliers,document'
                 ],
-            ]);
+            ];
 
-            $document = $data['document'];
+            $document = $request->input('document');
+            
+            // update validation rules for CNPJ
+            if (strlen($document) == 14) {
+                $rules['name'] = 'nullable|string|max:255';
+            }
+
+            // validate the incoming request
+            $data = $request->validate($rules);
 
             // Find CNPJ data using an external service
             if (strlen($document) == 14) {
