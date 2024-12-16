@@ -39,13 +39,23 @@ chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache
 chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
 ```
 
-6.Execute as _migrations_:
+**6.Certifique-se de executar novamente o seguinte comando no diretório `app`**
+
+```
+cp .env.example .env
+```
+
+7.Execute o seguinte comando para gerar a chave da aplicação:
+
+```
+php artisan key:generate
+```
+
+8.Execute as _migrations_:
 
 ```
 php artisan migrate
 ```
-
-> **Dica:** Certifique-se de executar novamente o comando `cp .env.example .env` no diretório `app!`
 
 ---
 
