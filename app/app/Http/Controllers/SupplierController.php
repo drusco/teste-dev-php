@@ -20,9 +20,32 @@ class SupplierController extends Controller
         return response()->json($this->supplierRepository->all());
     }
 
-    public function show($id)
+    public function show($document)
     {
-        return response()->json($this->supplierRepository->find($id));
+        try {
+            $supplier = $this->supplierRepository->find($document);
+
+            if(!$supplier) {
+                return response()->json([
+                    'message' => 'The document could not be found',
+                    'errors' => ['supplier' => ['An error occurred while finding the supplier.']],
+                ], 404);
+            }
+
+            return response()->json($supplier);
+        } catch (Exception $e) {
+            // Log the error message
+            \Log::error('An error occurred while finding the supplier.', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Handle custom error response
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'errors' => ['supplier' => ['An error occurred while finding the supplier.']],
+            ], 500);
+        }
     }
 
     public function store(Request $request)

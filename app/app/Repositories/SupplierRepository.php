@@ -21,9 +21,15 @@ class SupplierRepository implements SupplierRepositoryInterface
         return Supplier::all();
     }
 
-    public function find($id)
+    public function find($document)
     {
-        return Supplier::findOrFail($id);
+        $supplier = Supplier::where('document', $document)->first();
+
+        if(!$supplier) {
+            return null;
+        }
+
+        return $supplier;
     }
 
     public function findCnpjData(string $cnpj): ?array {
@@ -70,7 +76,7 @@ class SupplierRepository implements SupplierRepositoryInterface
         if(!$supplier) {
             return null;
         }
-        
+
         return $supplier->delete();
     }
 }
