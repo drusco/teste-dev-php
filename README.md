@@ -1,71 +1,132 @@
 ## Teste para Desenvolvedor PHP/Laravel
 
-Bem-vindo ao teste de desenvolvimento para a posição de Desenvolvedor PHP/Laravel.
+### Descrição do Projeto
 
-O objetivo deste teste é desenvolver uma API Rest para o cadastro de fornecedores, permitindo a busca por CNPJ ou CPF, utilizando Laravel no backend.
-
-## Descrição do Projeto
+Teste desenvolvido por **Pedro Gallardo** para a empresa **Revenda Mais**, com o objetivo de demonstrar habilidades técnicas de backend utilizando **PHP** e **Laravel**.
 
 ### Backend (API Laravel):
 
-#### CRUD de Fornecedores:
+#### Como Configurar o Projeto:
 
-- **Criar Fornecedor:**
+1.Na pasta principal, crie o arquivo de variáveis de ambiente:
 
-  - Permita o cadastro de fornecedores usando CNPJ ou CPF, incluindo informações como nome/nome da empresa, contato, endereço, etc.
-  - Valide a integridade e o formato dos dados, como o formato correto de CNPJ/CPF e a obrigatoriedade de campos.
+```
+cp .env.example .env
+```
 
-- **Editar Fornecedor:**
+2\. Inicie o ambiente utilizando **Docker**:
 
-  - Facilite a atualização das informações de fornecedores, mantendo a validação dos dados.
+```
+docker-compose up -d
+```
 
-- **Excluir Fornecedor:**
+3.Acesse o container do ambiente:
 
-  - Possibilite a remoção segura de fornecedores.
+```
+docker exec -it laravel-teste-dev bash
+```
 
-- **Listar Fornecedores:**
-  - Apresente uma lista paginada de fornecedores, com filtragem e ordenação.
+4.Dentro do container, certifique-se de estar no diretório `app` e instale as dependências com **Composer**:
 
-#### Migrations:
+```
+composer install
+```
 
-- Utilize migrations do Laravel para definir a estrutura do banco de dados, garantindo uma boa organização e facilidade de manutenção.
+5.Atualize as permissões das pastas de _storage_, _cache_ e _logs_:
 
-## Requisitos
+```
+chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache
+chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+```
 
-### Backend:
+6.Execute as _migrations_:
 
-- Implementar busca por CNPJ na [BrasilAPI](https://brasilapi.com.br/docs#tag/CNPJ/paths/~1cnpj~1v1~1{cnpj}/get) ou qualquer outro endpoint público.
+```
+php artisan migrate
+```
 
-## Tecnologias a serem utilizadas
+> **Dica:** Certifique-se de executar novamente o comando `cp .env.example .env` no diretório `app!`
 
-- Framework Laravel (PHP) 9.x ou superior
-- MySQL ou Postgres
+---
 
-## Critérios de Avaliação
+### Documentação dos Endpoints
 
-- Adesão aos requisitos funcionais e técnicos.
-- Qualidade do código, incluindo organização, padrões de desenvolvimento e segurança.
-- Documentação do projeto, incluindo um README detalhado com instruções de instalação e operação.
+Para facilitar o uso dos endpoints da API, você pode importar o arquivo Postman disponível em:  
+`docs/Revenda Mais (teste api).postman_collection.json`
 
-## Bônus
+A aplicação estará acessível em [**http://localhost:9000**](http://localhost:9000).  
+**Nota:** Todas as requisições devem incluir o cabeçalho `Accept` com o valor `application/json`.
 
-- Implementação de Repository Pattern.
-- Implementação de testes automatizados.
-- Dockerização do ambiente de desenvolvimento.
-- Implementação de cache para otimizar o desempenho.
+---
 
-## Entrega
+### Endpoints Disponíveis
 
-- Para iniciar o teste, faça um fork deste repositório; Se você apenas clonar o repositório não vai conseguir fazer push.
-- Crie uma branch com o nome que desejar;
-- Altere o arquivo README.md com as informações necessárias para executar o seu teste (comandos, migrations, seeds, etc);
-- Depois de finalizado, envie-nos o pull request;
+#### **GET /api/suppliers**
 
-## Extra
+Retorna a lista completa de fornecedores com suporte a filtros, paginação e ordenação.
 
-Entrar no container:
-`docker exec -it laravel-teste-dev bash`
-Entrar na pasta do projeto:
-`cd app`
-Rodar as migrations:
-`php artisan migrate`
+**Exemplo:**
+
+```
+curl --location -g --request GET 'http://localhost:9000/api/suppliers?per_page=3&order_by=created_at&order_direction=desc&filters[name]=bush' \
+--header 'Accept: application/json'
+```
+
+**Parâmetros disponíveis:**
+
+- **per_page** _(número)_: Número de itens por página.
+- **order_by** _(string)_: Nome da coluna para ordenação.
+- **order_direction** _(desc|asc)_: Direção da ordenação.
+- **filters** _(array)_: Filtros no formato `coluna: valor`.
+
+---
+
+#### **POST /api/suppliers**
+
+Cria um novo fornecedor.
+
+**Payload:**
+
+```
+{
+  "name": "string, obrigatório para documentos CPF",
+  "email": "string, obrigatório",
+  "document": "string, obrigatório (11 ou 14 caracteres numéricos)",
+  "address": "string, opcional",
+  "phone": "string, opcional"
+}
+```
+
+---
+
+#### **GET /api/suppliers/{document}**
+
+Retorna as informações de um fornecedor específico com base no número do documento.
+
+---
+
+#### **PUT /api/suppliers/{document}**
+
+Atualiza os dados de um fornecedor.
+
+**Regras de validação:**
+
+- Fornecedores com **CNPJ (14 dígitos)**: Não podem alterar o nome nem o endereço, pois essas informações são obtidas automaticamente de uma API externa no momento da criação do fornecedor.
+- Fornecedores com **CPF (11 dígitos)**: Podem atualizar todos os dados, exceto o número do documento.
+
+**Payload:**
+
+```
+{
+  "name": "string, opcional",
+  "email": "string, opcional (deve ser um email válido)",
+  "address": "string, opcional",
+  "phone": "string, opcional"
+}
+```
+
+---
+
+#### **DELETE /api/suppliers/{document}**
+
+Remove um fornecedor com base no número do documento, seja **CPF** ou **CNPJ**.
